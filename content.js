@@ -230,7 +230,12 @@ function applyFullMapHeight() {
     }
     
     /* Hide footer to reclaim space */
-    footer, .site-footer, #footer {
+    footer, .site-footer, #footer, .Footer {
+      display: none !important;
+    }
+    
+    /* Hide the bottom bar/info section */
+    .info-bar, .bottom-bar, .site-info {
       display: none !important;
     }
     
@@ -238,6 +243,29 @@ function applyFullMapHeight() {
     .bootstrap, .container-fluid, .ObservationsMapView {
       margin-bottom: 0 !important;
       padding-bottom: 0 !important;
+    }
+    
+    /* Prevent page from scrolling past the map */
+    html, body {
+      overflow-y: auto !important;
+      height: auto !important;
+    }
+    
+    /* Ensure map controls stay inside the map */
+    .leaflet-control-zoom {
+      position: absolute !important;
+      left: 10px !important;
+      top: 10px !important;
+    }
+    
+    /* Fix for controls appearing outside map */
+    .leaflet-top, .leaflet-bottom {
+      position: absolute !important;
+      z-index: 1000 !important;
+    }
+    
+    .leaflet-left {
+      left: 0 !important;
     }
     
     /* Ensure the observation panel is visible and properly styled */
@@ -262,11 +290,6 @@ function applyFullMapHeight() {
     }
     
     /* Improve visibility of map controls on 4K */
-    .leaflet-control-zoom {
-      margin-left: 10px !important;
-      box-shadow: 0 1px 5px rgba(0,0,0,0.4) !important;
-    }
-    
     .leaflet-control-zoom a {
       width: 36px !important;
       height: 36px !important;
