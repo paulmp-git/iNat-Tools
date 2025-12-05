@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iNaturalist Map Enhancer</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <h1>iNaturalist Map Enhancer</h1>
+    
+    <div id="status-indicator" class="status">Checking status...</div>
+    <div id="status-message" class="status-message"></div>
+    
+    <div class="setting">
+      <label for="fullMapHeight">Full Map Height</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="fullMapHeight">
+        <span class="slider"></span>
+      </div>
+    </div>
+    
+    <div class="info">
+      <p>Maximizes the map height on iNaturalist observation pages.</p>
+      <p class="note">Settings apply to the current tab only.</p>
+    </div>
+    
+    <div class="actions">
+      <button id="reload-page" class="button">Reload Page</button>
+    </div>
+    
+    <div class="footer">
+      <p>Version 1.0.0</p>
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>

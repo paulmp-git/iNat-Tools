@@ -1,0 +1,309 @@
+/**
+ * iNaturalist Map Enhancer - Popup Styles
+ * Optimized for performance and maintainability
+ */
+
+/* ============================================================================
+   RESET & BASE STYLES
+   ============================================================================ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* Color palette */
+  --color-primary: #74ac00;
+  --color-primary-dark: #4a7800;
+  --color-text: #333;
+  --color-text-light: #666;
+  --color-text-lighter: #888;
+  --color-text-muted: #999;
+  --color-bg: #f8f8f8;
+  --color-bg-light: #f0f0f0;
+  --color-bg-lighter: #e0e0e0;
+  --color-bg-active: #e6f4d7;
+  --color-border: #eee;
+  --color-white: #fff;
+  
+  /* Spacing */
+  --spacing-xs: 6px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  
+  /* Typography */
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-md: 13px;
+  --font-size-lg: 18px;
+  
+  /* Transitions */
+  --transition-fast: 0.3s ease;
+  --transition-normal: 0.4s;
+  
+  /* Border radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-pill: 24px;
+  --radius-circle: 50%;
+  
+  /* Layout */
+  --popup-width: 300px;
+  --toggle-width: 46px;
+  --toggle-height: 24px;
+  --toggle-knob-size: 18px;
+  --toggle-knob-spacing: 3px;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, 
+               Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  width: var(--popup-width);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================================================
+   LAYOUT
+   ============================================================================ */
+
+.container {
+  padding: var(--spacing-lg);
+}
+
+h1 {
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--spacing-lg);
+  color: var(--color-primary);
+  text-align: center;
+  font-weight: 600;
+}
+
+/* ============================================================================
+   SETTINGS
+   ============================================================================ */
+
+.setting {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.setting label {
+  font-weight: 500;
+  font-size: var(--font-size-md);
+  cursor: pointer;
+  user-select: none;
+}
+
+/* ============================================================================
+   TOGGLE SWITCH
+   ============================================================================ */
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: var(--toggle-width);
+  height: var(--toggle-height);
+  flex-shrink: 0;
+}
+
+.toggle-switch input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: #ccc;
+  transition: background-color var(--transition-normal);
+  border-radius: var(--radius-pill);
+  will-change: background-color;
+}
+
+.slider::before {
+  content: "";
+  position: absolute;
+  height: var(--toggle-knob-size);
+  width: var(--toggle-knob-size);
+  left: var(--toggle-knob-spacing);
+  bottom: var(--toggle-knob-spacing);
+  background-color: var(--color-white);
+  transition: transform var(--transition-normal);
+  border-radius: var(--radius-circle);
+  will-change: transform;
+}
+
+input:checked + .slider {
+  background-color: var(--color-primary);
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 0 2px var(--color-primary);
+  outline: none;
+}
+
+input:focus-visible + .slider {
+  box-shadow: 0 0 0 3px var(--color-primary);
+}
+
+input:checked + .slider::before {
+  transform: translateX(22px);
+}
+
+/* Hover states */
+.slider:hover {
+  opacity: 0.9;
+}
+
+input:disabled + .slider {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+   STATUS & MESSAGES
+   ============================================================================ */
+
+.status {
+  font-size: var(--font-size-sm);
+  padding: var(--spacing-xs) 10px;
+  margin-bottom: var(--spacing-md);
+  border-radius: var(--radius-sm);
+  text-align: center;
+  background-color: var(--color-bg-light);
+  color: var(--color-text-light);
+  transition: all var(--transition-fast);
+  font-weight: 500;
+}
+
+.status.active {
+  background-color: var(--color-bg-active);
+  color: var(--color-primary-dark);
+}
+
+.status.inactive {
+  background-color: var(--color-bg-light);
+  color: var(--color-text-lighter);
+}
+
+.status-message {
+  font-size: var(--font-size-sm);
+  height: 16px;
+  margin-bottom: var(--spacing-md);
+  text-align: center;
+  color: var(--color-primary-dark);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  font-weight: 500;
+}
+
+/* ============================================================================
+   INFO SECTIONS
+   ============================================================================ */
+
+.info {
+  font-size: var(--font-size-md);
+  color: var(--color-text-light);
+  margin: var(--spacing-lg) 0;
+  line-height: 1.5;
+}
+
+.info p {
+  margin-bottom: var(--spacing-sm);
+}
+
+.info p:last-child {
+  margin-bottom: 0;
+}
+
+.note {
+  font-style: italic;
+  font-size: var(--font-size-sm);
+  margin-top: var(--spacing-sm);
+  color: var(--color-text-lighter);
+}
+
+/* ============================================================================
+   ACTIONS
+   ============================================================================ */
+
+.actions {
+  margin: var(--spacing-lg) 0;
+  text-align: center;
+}
+
+.button {
+  background-color: var(--color-bg-light);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  cursor: pointer;
+  font-size: var(--font-size-md);
+  font-weight: 500;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  transition: background-color var(--transition-fast);
+  user-select: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.button:hover {
+  background-color: var(--color-bg-lighter);
+}
+
+.button:active {
+  background-color: #d0d0d0;
+  transform: translateY(1px);
+}
+
+.button:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+   FOOTER
+   ============================================================================ */
+
+.footer {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-align: center;
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--color-border);
+}
+
+/* ============================================================================
+   ACCESSIBILITY
+   ============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
