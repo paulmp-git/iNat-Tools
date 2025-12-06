@@ -9,7 +9,8 @@
     "https://www.inaturalist.org/*",
     "https://inaturalist.org/*",
     "https://www.inaturalist.org.au/*",
-    "https://inaturalist.org.au/*"
+    "https://inaturalist.org.au/*",
+    "https://inaturalist.ala.org.au/*"
   ],
   "action": {
     "default_popup": "popup.html",
@@ -30,7 +31,8 @@
         "https://www.inaturalist.org/observations*",
         "https://inaturalist.org/observations*",
         "https://www.inaturalist.org.au/observations*",
-        "https://inaturalist.org.au/observations*"
+        "https://inaturalist.org.au/observations*",
+        "https://inaturalist.ala.org.au/observations*"
       ],
       "js": ["content.js"],
       "run_at": "document_idle",
