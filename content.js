@@ -20,6 +20,24 @@ const CONSTANTS = {
   DEBOUNCE_DELAY: 100
 };
 
+/**
+ * Checks if current page is a map view page where we should apply enhancements
+ * @returns {boolean} True if this is a map view page
+ */
+function isMapViewPage() {
+  const url = window.location.href;
+  const pathname = window.location.pathname;
+  
+  // Check if we're on the main observations page (not a user-specific page)
+  // Valid: /observations, /observations?anything
+  // Invalid: /observations/username, /observations/12345
+  const isMainObservationsPage = pathname === '/observations' || pathname === '/observations/';
+  
+  console.log('[iNat Map Enhancer] URL check:', { url, pathname, isMainObservationsPage });
+  
+  return isMainObservationsPage;
+}
+
 const SELECTORS = {
   MAP: '#map',
   LEAFLET_CONTAINER: '.leaflet-container',
@@ -180,14 +198,32 @@ function loadUserPreferences() {
  * Applies full map height styles to the page
  */
 function applyFullMapHeight() {
+  console.log('[iNat Map Enhancer] applyFullMapHeight called, stylesApplied:', stylesApplied);
+  
   // Skip if already applied
   if (stylesApplied) {
+    console.log('[iNat Map Enhancer] Styles already applied, skipping');
     return;
   }
   
+  // Only apply on map view pages
+  if (!isMapViewPage()) {
+    console.log('[iNat Map Enhancer] Not a map view page, skipping');
+    return;
+  }
+  
+  // Verify map element actually exists before applying styles
+  const mapElement = document.querySelector('#map, .leaflet-container');
+  console.log('[iNat Map Enhancer] Map element found:', !!mapElement);
+  if (!mapElement) {
+    return;
+  }
+  
+  console.log('[iNat Map Enhancer] Applying styles...');
+  
   const mapStyles = `
-    /* Base styles for the map container */
-    #map {
+    /* Base styles for the map container - fill available space */
+    body.inat-map-enhanced #map {
       position: relative !important;
       height: calc(100vh - ${CONSTANTS.MAP_HEIGHT_OFFSET}px) !important;
       min-height: ${CONSTANTS.MIN_MAP_HEIGHT}px !important;
@@ -195,86 +231,83 @@ function applyFullMapHeight() {
       overflow: hidden !important;
     }
     
-    /* Fix for the leaflet container */
-    .leaflet-container {
+    /* Fix for the leaflet container - ensure controls stay inside */
+    body.inat-map-enhanced .leaflet-container {
       height: 100% !important;
       width: 100% !important;
       overflow: hidden !important;
-      /* Prevent horizontal map repetition */
-      max-width: 100vw !important;
+      position: relative !important;
     }
     
-    /* Fix for the map wrapper */
-    .map-wrapper, .ObservationsMapView {
-      height: auto !important;
-      min-height: calc(100vh - ${CONSTANTS.MAP_HEIGHT_OFFSET}px) !important;
+    /* Fix for the map wrapper - fill space between header and footer */
+    body.inat-map-enhanced .ObservationsMapView {
+      height: calc(100vh - ${CONSTANTS.MAP_HEIGHT_OFFSET}px) !important;
+      min-height: ${CONSTANTS.MIN_MAP_HEIGHT}px !important;
       width: 100% !important;
       overflow: hidden !important;
+      position: relative !important;
     }
     
     /* Fix for the row containing the map */
-    .ObservationsMapView .row {
+    body.inat-map-enhanced .ObservationsMapView .row {
       width: 100% !important;
       margin-left: 0 !important;
       margin-right: 0 !important;
     }
     
     /* Fix for the columns */
-    .ObservationsMapView .col, 
-    .ObservationsMapView .col-xs-12, 
-    .ObservationsMapView .col-sm-12, 
-    .ObservationsMapView .col-md-12, 
-    .ObservationsMapView .col-lg-12 {
+    body.inat-map-enhanced .ObservationsMapView .col, 
+    body.inat-map-enhanced .ObservationsMapView .col-xs-12, 
+    body.inat-map-enhanced .ObservationsMapView .col-sm-12, 
+    body.inat-map-enhanced .ObservationsMapView .col-md-12, 
+    body.inat-map-enhanced .ObservationsMapView .col-lg-12 {
       padding-left: 0 !important;
       padding-right: 0 !important;
     }
     
-    /* Hide footer to reclaim space */
-    footer, .site-footer, #footer, .Footer {
-      display: none !important;
-    }
-    
-    /* Hide the bottom bar/info section */
-    .info-bar, .bottom-bar, .site-info {
-      display: none !important;
-    }
-    
-    /* Reduce bottom margin on main container */
-    .bootstrap, .container-fluid, .ObservationsMapView {
-      margin-bottom: 0 !important;
-      padding-bottom: 0 !important;
-    }
-    
-    /* Prevent page from scrolling past the map */
-    html, body {
-      overflow-y: auto !important;
-      height: auto !important;
-    }
-    
-    /* Ensure map controls stay inside the map */
-    .leaflet-control-zoom {
+    /* CRITICAL: Ensure leaflet controls stay INSIDE the map container */
+    body.inat-map-enhanced .leaflet-control-container {
       position: absolute !important;
-      left: 10px !important;
-      top: 10px !important;
-    }
-    
-    /* Fix for controls appearing outside map */
-    .leaflet-top, .leaflet-bottom {
-      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      pointer-events: none !important;
       z-index: 1000 !important;
     }
     
-    .leaflet-left {
-      left: 0 !important;
+    body.inat-map-enhanced .leaflet-control-container > * {
+      pointer-events: auto !important;
     }
     
-    /* Ensure the observation panel is visible and properly styled */
-    .ObservationsMapView .observation-cards,
-    .ObservationsMapView .observations-list {
+    /* Ensure map controls stay inside the map */
+    body.inat-map-enhanced .leaflet-top {
+      position: absolute !important;
+      top: 10px !important;
+      z-index: 1000 !important;
+    }
+    
+    body.inat-map-enhanced .leaflet-bottom {
+      position: absolute !important;
+      bottom: 10px !important;
+      z-index: 1000 !important;
+    }
+    
+    body.inat-map-enhanced .leaflet-left {
+      left: 10px !important;
+    }
+    
+    body.inat-map-enhanced .leaflet-right {
+      right: 10px !important;
+    }
+    
+    /* Observation cards - aligned right with 15px gap */
+    body.inat-map-enhanced .ObservationsMapView .observation-cards,
+    body.inat-map-enhanced .ObservationResultsMap .observation-cards {
       position: absolute !important;
       top: ${CONSTANTS.OBS_PANEL_SPACING}px !important;
-      bottom: ${CONSTANTS.OBS_PANEL_SPACING}px !important;
       right: ${CONSTANTS.OBS_PANEL_SPACING}px !important;
+      bottom: ${CONSTANTS.OBS_PANEL_SPACING}px !important;
       width: ${CONSTANTS.OBS_PANEL_WIDTH}px !important;
       max-height: calc(100% - ${CONSTANTS.OBS_PANEL_SPACING * 2}px) !important;
       overflow-y: auto !important;
@@ -284,19 +317,17 @@ function applyFullMapHeight() {
       box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25) !important;
     }
     
-    /* Ensure the map legend and controls remain accessible */
-    .leaflet-control-container {
-      z-index: 1000 !important;
-    }
-    
     /* Improve visibility of map controls on 4K */
-    .leaflet-control-zoom a {
+    body.inat-map-enhanced .leaflet-control-zoom a {
       width: 36px !important;
       height: 36px !important;
       line-height: 36px !important;
       font-size: 20px !important;
     }
   `;
+  
+  // Add marker class to body so CSS can target it
+  document.body.classList.add('inat-map-enhanced');
   
   injectStyles(mapStyles, CONSTANTS.STYLE_ID);
   stylesApplied = true;
@@ -317,6 +348,9 @@ function removeFullMapHeight() {
   if (styleElement) {
     styleElement.remove();
   }
+  
+  // Remove the body class marker
+  document.body.classList.remove('inat-map-enhanced');
   
   stylesApplied = false;
   
@@ -583,7 +617,7 @@ function init() {
   loadUserPreferences();
   
   // Apply styles immediately if we're on the right page and map exists
-  if (window.location.href.includes('inaturalist.org/observations')) {
+  if (isMapViewPage()) {
     // Use requestAnimationFrame to ensure DOM is ready
     requestAnimationFrame(() => {
       if (config.fullMapHeight && getCachedElement(SELECTORS.MAP, 'map')) {

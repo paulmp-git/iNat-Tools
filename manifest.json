@@ -21,7 +21,13 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://www.inaturalist.org/observations*"],
+      "matches": [
+        "https://www.inaturalist.org/observations",
+        "https://www.inaturalist.org/observations?*"
+      ],
+      "exclude_matches": [
+        "https://www.inaturalist.org/observations/*"
+      ],
       "js": ["content.js"],
       "run_at": "document_idle",
       "all_frames": false
