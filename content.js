@@ -13,7 +13,7 @@ const CONSTANTS = {
   MAP_HEIGHT_OFFSET: 210,  // Account for header (nav + search + stats + view toggle)
   MIN_MAP_HEIGHT: 400,
   OBS_PANEL_WIDTH: 350,    // Slightly wider for 4K readability
-  OBS_PANEL_SPACING: 15,
+  OBS_PANEL_SPACING: 25,
   ZOOM_ADJUSTMENT: 0.5,
   MIN_ZOOM_LEVEL: 1,
   STYLE_ID: 'inat-map-enhancer-styles',
@@ -221,76 +221,55 @@ function applyFullMapHeight() {
   
   console.log('[iNat Map Enhancer] Applying styles...');
   
+  // Calculate header offset: nav bar (~56px) + search/stats area (~100px) + view toggle (~40px) + some padding
+  const headerOffset = 210;
+  
+  // Footer is approximately 190px tall
+  const footerOffset = 190;
+  // Height for obs panel = viewport - header - footer - padding
+  const obsHeight = `calc(100vh - ${headerOffset}px - ${footerOffset}px - ${CONSTANTS.OBS_PANEL_SPACING * 2}px)`;
+  
+  // Map height = viewport - header - footer
+  const mapHeight = `calc(100vh - ${headerOffset}px - ${footerOffset}px)`;
+  
   const mapStyles = `
-    /* Main map view container - use flexbox for proper layout */
-    body.inat-map-enhanced .ObservationsMapView {
-      display: flex !important;
-      flex-direction: row !important;
-      height: calc(100vh - ${CONSTANTS.MAP_HEIGHT_OFFSET}px) !important;
-      min-height: ${CONSTANTS.MIN_MAP_HEIGHT}px !important;
+    /* Map containers - using iNaturalist's actual selectors */
+    body.inat-map-enhanced #obs-container,
+    body.inat-map-enhanced #obs-container .container,
+    body.inat-map-enhanced #map,
+    body.inat-map-enhanced #observations-map {
+      height: ${mapHeight} !important;
+    }
+    
+    /* Break the Bootstrap container constraints for the map area */
+    body.inat-map-enhanced #obs-container .container {
       width: 100% !important;
-      position: relative !important;
+      max-width: 100% !important;
+      padding: 0 !important;
+      margin: 0 !important;
     }
     
-    /* Map container takes remaining space */
-    body.inat-map-enhanced .ObservationsMapView > div:first-child,
-    body.inat-map-enhanced .ObservationsMapView .map-container,
-    body.inat-map-enhanced #map {
-      flex: 1 !important;
-      height: 100% !important;
-      min-height: ${CONSTANTS.MIN_MAP_HEIGHT}px !important;
-      position: relative !important;
-    }
-    
-    /* Fix for the leaflet container */
-    body.inat-map-enhanced .leaflet-container {
-      height: 100% !important;
-      width: 100% !important;
-      position: relative !important;
-    }
-    
-    /* Observation cards panel - fixed width on right */
-    body.inat-map-enhanced .ObservationsMapView > div:last-child:not(:first-child),
-    body.inat-map-enhanced .observation-cards-container,
-    body.inat-map-enhanced .ObservationsMapView .observation-cards {
-      width: ${CONSTANTS.OBS_PANEL_WIDTH}px !important;
-      min-width: ${CONSTANTS.OBS_PANEL_WIDTH}px !important;
-      height: 100% !important;
+    /* #obs panel - use fixed positioning to break out of container */
+    body.inat-map-enhanced #obs {
+      height: calc(${obsHeight} - 90px) !important;
+      max-height: ${obsHeight} !important;
       overflow-y: auto !important;
-      background: white !important;
-      margin-left: ${CONSTANTS.OBS_PANEL_SPACING}px !important;
-      border-radius: 8px !important;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15) !important;
-    }
-    
-    /* Ensure map controls stay inside the map */
-    body.inat-map-enhanced .leaflet-control-container {
-      position: absolute !important;
+      position: fixed !important;
+      right: ${CONSTANTS.OBS_PANEL_SPACING}px !important;
+      top: calc(${headerOffset}px + 60px) !important;
       z-index: 1000 !important;
     }
     
-    body.inat-map-enhanced .leaflet-top {
-      top: 10px !important;
+    /* Map controls - add 20px margin from left edge */
+    body.inat-map-enhanced #map-controls {
+      margin-left: 20px !important;
     }
     
-    body.inat-map-enhanced .leaflet-bottom {
-      bottom: 10px !important;
-    }
-    
-    body.inat-map-enhanced .leaflet-left {
-      left: 10px !important;
-    }
-    
-    body.inat-map-enhanced .leaflet-right {
-      right: 10px !important;
-    }
-    
-    /* Improve visibility of map controls */
-    body.inat-map-enhanced .leaflet-control-zoom a {
-      width: 36px !important;
-      height: 36px !important;
-      line-height: 36px !important;
-      font-size: 20px !important;
+    /* Map legend - position at bottom left with 35px from edges */
+    body.inat-map-enhanced #map-legend-control {
+      position: absolute !important;
+      top: calc(${mapHeight} - 70px) !important;
+      left: 35px !important;
     }
   `;
   
