@@ -28,10 +28,13 @@ function isMapViewPage() {
   const url = window.location.href;
   const pathname = window.location.pathname;
   
-  // Check if we're on the main observations page (not a user-specific page)
-  // Valid: /observations, /observations?anything
-  // Invalid: /observations/username, /observations/12345
-  const isMainObservationsPage = pathname === '/observations' || pathname === '/observations/';
+  // Check if we're on an observations page
+  // Valid: /observations, /observations/, /observations?anything
+  // Also valid: /observations/identify (identify modal)
+  // Invalid: /observations/12345 (single observation page)
+  const isObservationsPath = pathname.startsWith('/observations');
+  const isSingleObservation = /^\/observations\/\d+/.test(pathname);
+  const isMainObservationsPage = isObservationsPath && !isSingleObservation;
   
   console.log('[iNat Map Enhancer] URL check:', { url, pathname, isMainObservationsPage });
   
@@ -196,15 +199,19 @@ function loadUserPreferences() {
 
 /**
  * Applies full map height styles to the page
+ * @param {boolean} force - Force re-application even if already applied
  */
-function applyFullMapHeight() {
-  console.log('[iNat Map Enhancer] applyFullMapHeight called, stylesApplied:', stylesApplied);
+function applyFullMapHeight(force = false) {
+  console.log('[iNat Map Enhancer] applyFullMapHeight called, stylesApplied:', stylesApplied, 'force:', force);
   
-  // Skip if already applied
-  if (stylesApplied) {
+  // Skip if already applied (unless forced)
+  if (stylesApplied && !force) {
     console.log('[iNat Map Enhancer] Styles already applied, skipping');
     return;
   }
+  
+  // Update config state
+  config.fullMapHeight = true;
   
   // Only apply on map view pages
   if (!isMapViewPage()) {
@@ -393,15 +400,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
   
   try {
+    console.log('[iNat Map Enhancer] Message received:', message);
+    
     if (message.action === 'toggleFullMapHeight') {
+      console.log('[iNat Map Enhancer] Toggle action, enabled:', message.enabled, 'current stylesApplied:', stylesApplied);
       config.fullMapHeight = message.enabled;
       
       if (config.fullMapHeight) {
-        applyFullMapHeight();
+        applyFullMapHeight(true); // Force re-application when toggling
       } else {
         removeFullMapHeight();
       }
       
+      console.log('[iNat Map Enhancer] After toggle, stylesApplied:', stylesApplied);
       sendResponse({ success: true });
     } else if (message.action === 'getState') {
       sendResponse({ fullMapHeight: config.fullMapHeight });
