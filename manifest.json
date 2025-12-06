@@ -5,7 +5,12 @@
   "description": "Enhances the iNaturalist observation map page by maximizing map height and improving layout",
   "author": "Your Name",
   "permissions": ["storage"],
-  "host_permissions": ["https://www.inaturalist.org/*"],
+  "host_permissions": [
+    "https://www.inaturalist.org/*",
+    "https://inaturalist.org/*",
+    "https://www.inaturalist.org.au/*",
+    "https://inaturalist.org.au/*"
+  ],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
@@ -22,7 +27,10 @@
   "content_scripts": [
     {
       "matches": [
-        "https://www.inaturalist.org/observations*"
+        "https://www.inaturalist.org/observations*",
+        "https://inaturalist.org/observations*",
+        "https://www.inaturalist.org.au/observations*",
+        "https://inaturalist.org.au/observations*"
       ],
       "js": ["content.js"],
       "run_at": "document_idle",
