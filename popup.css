@@ -98,10 +98,10 @@ h1 {
   border-bottom: 1px solid var(--color-border);
 }
 
-.setting label {
+.setting-label {
   font-weight: 500;
   font-size: var(--font-size-md);
-  cursor: pointer;
+  cursor: default;
   user-select: none;
 }
 
