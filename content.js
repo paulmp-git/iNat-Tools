@@ -17,6 +17,8 @@ const CONSTANTS = {
   ZOOM_ADJUSTMENT: 0.5,
   MIN_ZOOM_LEVEL: 1,
   STYLE_ID: 'inat-map-enhancer-styles',
+  FILTERBAR_STYLE_ID: 'inat-map-enhancer-filterbar-styles',
+  FILTERBAR_ID: 'inat-map-enhancer-filterbar',
   DEBOUNCE_DELAY: 100
 };
 
@@ -62,6 +64,98 @@ const SELECTORS = {
   ],
   MAP_CONTROLS: '.map-control-group, .map-controls'
 };
+
+function getIconicTaxaFromUrl() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const value = params.get('iconic_taxa');
+    return value && value.trim() ? value.trim() : null;
+  } catch {
+    return null;
+  }
+}
+
+function setIconicTaxaInUrl(value) {
+  const url = new URL(window.location.href);
+  if (value) {
+    url.searchParams.set('iconic_taxa', value);
+  } else {
+    url.searchParams.delete('iconic_taxa');
+  }
+  window.location.assign(url.toString());
+}
+
+function createQuickFilterBar() {
+  if (document.getElementById(CONSTANTS.FILTERBAR_ID)) {
+    return;
+  }
+
+  const filterStyles = `
+    #${CONSTANTS.FILTERBAR_ID} {
+      position: fixed;
+      top: 110px;
+      left: 70px;
+      z-index: 1100;
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      padding: 6px 8px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(3px);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+    #${CONSTANTS.FILTERBAR_ID} .inat-filter-btn {
+      appearance: none;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      background: #fff;
+      color: #2c2c2c;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px;
+      line-height: 16px;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+    #${CONSTANTS.FILTERBAR_ID} .inat-filter-btn:hover {
+      background: #f2f2f2;
+    }
+    #${CONSTANTS.FILTERBAR_ID} .inat-filter-btn.is-active {
+      background: #2b7bbb;
+      border-color: #2b7bbb;
+      color: #fff;
+    }
+  `;
+
+  injectStyles(filterStyles, CONSTANTS.FILTERBAR_STYLE_ID);
+
+  const bar = document.createElement('div');
+  bar.id = CONSTANTS.FILTERBAR_ID;
+
+  const buttons = [
+    { label: 'Mammals', value: 'Mammalia' },
+    { label: 'Birds', value: 'Aves' },
+    { label: 'Plants', value: 'Plantae' },
+    { label: 'Fungi', value: 'Fungi' },
+    { label: 'Clear', value: null }
+  ];
+
+  const activeValue = getIconicTaxaFromUrl();
+
+  for (const btn of buttons) {
+    const el = document.createElement('button');
+    el.type = 'button';
+    el.className = 'inat-filter-btn' + (btn.value && btn.value === activeValue ? ' is-active' : '');
+    el.textContent = btn.label;
+    el.addEventListener('click', () => setIconicTaxaInUrl(btn.value));
+    bar.appendChild(el);
+  }
+
+  (document.body || document.documentElement).appendChild(bar);
+}
 
 // ============================================================================
 // STATE MANAGEMENT
@@ -541,6 +635,9 @@ function init() {
   if (!isMapViewPage()) {
     return;
   }
+
+  // Add the quick filter bar early (it just manipulates URL parameters)
+  createQuickFilterBar();
 
   // Save original styles if needed for reverting
   const mapContainer = getCachedElement(SELECTORS.MAP, 'map');
