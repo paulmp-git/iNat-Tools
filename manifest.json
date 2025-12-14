@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "iNaturalist Map Enhancer",
   "version": "1.0.0",
-  "description": "Enhances the iNaturalist observation map page by maximizing map height and improving layout",
+  "description": "Enhances iNaturalist observations pages: maximizes map height and adds quick Mammals/Birds/Plants/Fungi filters",
   "author": "Your Name",
   "permissions": ["storage"],
   "host_permissions": [

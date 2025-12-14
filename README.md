@@ -5,9 +5,10 @@ A Chrome and Edge extension that enhances the iNaturalist observation map page b
 ## Features
 
 - **Full Map Height Mode**: Expands the map to use the full viewport height, eliminating wasted vertical space
+- **Quick Taxonomic Filters**: Adds a small on-page bar to quickly filter by broad categories (Mammals / Birds / Plants / Fungi) using iNaturalist's existing `iconic_taxa` search parameter
 - **Toggle Controls**: Easily enable or disable the full map height feature
 - **Compatible**: Works with both Chrome and Edge browsers
-- **Targeted**: Only activates on iNaturalist observation pages
+- **Targeted**: Only activates on the main observations browse pages (`/observations` and `/observations/identify`) and will not run on other `/observations/*` pages like `/observations/edit`
 
 ## Installation
 
@@ -25,6 +26,7 @@ A Chrome and Edge extension that enhances the iNaturalist observation map page b
 
 1. Navigate to the [iNaturalist observations page](https://www.inaturalist.org/observations)
 2. The map will automatically expand to full height
+3. Use the on-page quick filter bar to apply an `iconic_taxa` filter (Mammals / Birds / Plants / Fungi) or clear it
 3. Click the extension icon in the toolbar to access settings
 4. Toggle "Full Map Height" on/off as needed
 
