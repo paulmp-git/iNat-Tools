@@ -27,16 +27,17 @@ const CONSTANTS = {
 function isMapViewPage() {
   const url = window.location.href;
   const pathname = window.location.pathname;
+  const search = window.location.search;
   
-  // Check if we're on an observations page
-  // Valid: /observations, /observations/, /observations?anything
-  // Also valid: /observations/identify (identify modal)
-  // Invalid: /observations/12345 (single observation page)
-  const isObservationsPath = pathname.startsWith('/observations');
-  const isSingleObservation = /^\/observations\/\d+/.test(pathname);
-  const isMainObservationsPage = isObservationsPath && !isSingleObservation;
+  // Only run on the main observations browse page (optionally map view).
+  // Allow: /observations, /observations/, /observations/identify
+  // Disallow: /observations/edit, /observations/export, /observations/12345, etc.
+  const isSingleObservation = /^\/observations\/\d+(\/|$)/.test(pathname);
+  const isRootObservations = pathname === '/observations' || pathname === '/observations/';
+  const isIdentify = pathname.startsWith('/observations/identify');
+  const isMainObservationsPage = !isSingleObservation && (isRootObservations || isIdentify);
   
-  console.log('[iNat Map Enhancer] URL check:', { url, pathname, isMainObservationsPage });
+  console.log('[iNat Map Enhancer] URL check:', { url, pathname, search, isMainObservationsPage });
   
   return isMainObservationsPage;
 }
@@ -535,6 +536,12 @@ const debouncedMapHandler = debounce(() => {
  * Initializes the extension
  */
 function init() {
+  // Do nothing on non-target pages. This prevents layout changes on pages like
+  // /observations/edit that share the /observations* URL prefix.
+  if (!isMapViewPage()) {
+    return;
+  }
+
   // Save original styles if needed for reverting
   const mapContainer = getCachedElement(SELECTORS.MAP, 'map');
   if (mapContainer) {
